@@ -17,7 +17,9 @@ config = YAML.load_file('./configs/github.yml')
 @password    =  config['password']
 @credentials =  Base64.encode64("%s:%s" % [@user, @password])
 @basic_auth  =  "Basic %s" % @credentials
-@target = 'user'
+@another_user = config['another_user']
+@target_current_user = 'user/orgs'
+@target_another_user = "users/#{@another_user}/orgs"
 
 
 def execute_request(method, endpoint, options={}, data=nil, extra_headers=nil)
@@ -47,4 +49,5 @@ def execute_request(method, endpoint, options={}, data=nil, extra_headers=nil)
   puts (payload) if not payload.nil?
 end
 
-execute_request(:get, @target, {})
+execute_request(:get, @target_current_user, {})
+execute_request(:get, @target_another_user, {})
