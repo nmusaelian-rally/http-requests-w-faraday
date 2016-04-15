@@ -2,6 +2,7 @@ require 'faraday'
 require 'yaml'
 require 'base64'
 require 'json'
+require 'time'
 require 'pp'
 
 @url_prefix = 'https://api.github.com'
@@ -18,9 +19,12 @@ config = YAML.load_file('./configs/github.yml')
 @credentials =  Base64.encode64("%s:%s" % [@user, @password])
 @basic_auth  =  "Basic %s" % @credentials
 @another_user = config['another_user']
+@repo_name = config['repo_name']
 @target_current_user = 'user/orgs'
 @target_another_user = "users/#{@another_user}/orgs"
-
+@commits_since_endpoint = "repos/#{@user}/#{@repo_name}/commits"
+#@since = '2016-04-15T01:00:00Z'
+@since = (Time.now - 3600).iso8601
 
 def execute_request(method, endpoint, options={}, data=nil, extra_headers=nil)
   response = @conn.send(method) do |req|
@@ -49,5 +53,6 @@ def execute_request(method, endpoint, options={}, data=nil, extra_headers=nil)
   puts (payload) if not payload.nil?
 end
 
-execute_request(:get, @target_current_user, {})
-execute_request(:get, @target_another_user, {})
+#execute_request(:get, @target_current_user, {})
+#execute_request(:get, @target_another_user, {})
+execute_request(:get, @commits_since_endpoint, since: @since)
